@@ -10,6 +10,9 @@ from sentence_transformers import SentenceTransformer, util
 import torch
 from random import choice
 
+# https://github.com/UKPLab/sentence-transformers/tree/master/examples/unsupervised_learning/SimCSE
+# I think by finetuning `sciq` dataset on given model with SimCSE approach would yeld better results
+# For now it can be evaluated on validation set 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
 
@@ -40,7 +43,7 @@ corpus_embeddings, questions, question_answer_mapper, possible_questions = preco
 def find_match(query):
     query_embedding = model.encode(query, convert_to_tensor=True)
 
-    cos_scores = util.cos_sim(corpus_embeddings, query_embedding)[0]
+    cos_scores = util.cos_sim(query_embedding, corpus_embeddings)[0]
     # For know choose top 1 result
     top_results = torch.topk(cos_scores, k=1)
     scores, indicies = top_results[0], top_results[1]
@@ -56,9 +59,9 @@ def execute(request: SimpleText, ray: OpenfabricExecutionRay) -> SimpleText:
     for text in request.text:
         score, indicie = find_match(text)
         if score < 0.5:
-            answer = '''Sorry I am dumb, please try to ask me question about science, like:''' + \
+            answer = f'''test: {question_answer_mapper[questions[indicie]]} Sorry I am dumb, please try to ask me question about science, like:''' + \
             f''' {choice(possible_questions)}'''
-        elif score < 0.7:
+        elif score < 0.6:
             answer = f'I am not sure the answer might be:  {question_answer_mapper[questions[indicie]]}'
         else:
             answer = f'The answer is: {question_answer_mapper[questions[indicie]]}'
