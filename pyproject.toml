@@ -7,7 +7,12 @@ authors = ["Andrei"]
 [tool.poetry.dependencies]
 python = "^3.8"
 openfabric-pysdk = "0.1.11"
-
+# https://stackoverflow.com/questions/71850969/importerror-cannot-import-name-run-with-reloader-from-werkzeug-serving
+Werkzeug="2.0.1"
+transformers="4.25.1"
+sentence_transformers="2.2.2"
+datasets="2.8.0"
+torch="1.13.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
